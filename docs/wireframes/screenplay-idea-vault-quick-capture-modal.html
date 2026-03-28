@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Quick Capture Modal — Screenplay Idea Vault</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      background: #e8e8e8;
+      color: #222;
+      padding: 32px 24px 64px;
+    }
+    h1, h2, h3 { font-weight: 600; }
+
+    /* ─── Metadata header ──────────────────────────────────────── */
+    .wf-meta {
+      font-size: 11px;
+      color: #888;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      margin-bottom: 28px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .wf-meta span { display: inline-flex; gap: 4px; }
+    .wf-meta strong { color: #555; }
+
+    /* ─── Section labels ───────────────────────────────────────── */
+    .wf-state-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin: 40px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .wf-state-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ccc;
+    }
+
+    /* ─── Screen container (simulates browser viewport) ───────── */
+    .wf-viewport {
+      background: #b0b0b0;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #999;
+      position: relative;
+    }
+    .wf-browser-chrome {
+      background: #d4d4d4;
+      border-bottom: 1px solid #bbb;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wf-traffic-lights { display: flex; gap: 5px; }
+    .wf-traffic-lights span {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #bbb; border: 1px solid #aaa;
+    }
+    .wf-url-bar {
+      flex: 1;
+      background: white;
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* ─── Background app page (dimmed behind modal) ────────────── */
+    .wf-page-bg {
+      background: #f5f5f5;
+      min-height: 420px;
+      padding: 16px;
+      position: relative;
+    }
+    .wf-page-dimmed { background: #f0f0f0; }
+    .wf-page-nav {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      height: 48px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+    }
+    .wf-nav-logo {
+      font-weight: 700;
+      font-size: 13px;
+      color: #999;
+      background: #eee;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    .wf-nav-link {
+      font-size: 12px;
+      color: #bbb;
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    .wf-nav-link.active {
+      background: #eee;
+      color: #666;
+    }
+    .wf-nav-spacer { flex: 1; }
+    .wf-fab {
+      width: 36px; height: 36px;
+      background: #555;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 300;
+      border: none;
+      cursor: default;
+    }
+    .wf-page-content-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      opacity: 0.35;
+    }
+    .wf-content-row {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      height: 56px;
+    }
+
+    /* ─── Modal overlay ────────────────────────────────────────── */
+    .wf-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .wf-modal {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .wf-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .wf-modal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #222;
+    }
+    .wf-modal-shortcut {
+      font-size: 10px;
+      color: #aaa;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 2px 5px;
+      margin-left: 8px;
+    }
+    .wf-close-btn {
+      width: 26px; height: 26px;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      color: #777;
+      cursor: default;
+    }
+    .wf-modal-body { padding: 16px 18px; }
+    .wf-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px 14px;
+      border-top: 1px solid #eee;
+    }
+
+    /* ─── Form elements ────────────────────────────────────────── */
+    .wf-field { margin-bottom: 14px; }
+    .wf-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    .wf-label .wf-required {
+      color: #c00;
+      margin-left: 2px;
+    }
+    .wf-label .wf-optional {
+      font-weight: 400;
+      text-transform: none;
+      color: #aaa;
+      letter-spacing: 0;
+      margin-left: 4px;
+      font-size: 10px;
+    }
+    .wf-input {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #888;
+      background: white;
+    }
+    .wf-input.filled { color: #222; }
+    .wf-input.error-state { border-color: #c00; background: #fff8f8; }
+    .wf-textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #888;
+      background: white;
+      resize: none;
+      height: 96px;
+      display: block;
+      position: relative;
+    }
+    .wf-textarea.filled { color: #222; }
+    .wf-textarea-wrap { position: relative; }
+    .wf-voice-btn {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      width: 26px; height: 26px;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      color: #888;
+      cursor: default;
+    }
+
+    /* ─── Type pill selector ───────────────────────────────────── */
+    .wf-type-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .wf-pill {
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      background: white;
+      cursor: default;
+      white-space: nowrap;
+    }
+    .wf-pill.selected {
+      background: #444;
+      color: white;
+      border-color: #444;
+    }
+    .wf-pill.unset {
+      border-style: dashed;
+      color: #aaa;
+    }
+
+    /* ─── Project + tags row ───────────────────────────────────── */
+    .wf-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ─── Buttons ──────────────────────────────────────────────── */
+    .wf-btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: default;
+    }
+    .wf-btn-ghost {
+      background: white;
+      border: 1px solid #ccc;
+      color: #555;
+    }
+    .wf-btn-primary {
+      background: #333;
+      border: 1px solid #222;
+      color: white;
+    }
+    .wf-btn-primary.disabled {
+      background: #bbb;
+      border-color: #bbb;
+      color: #eee;
+    }
+    .wf-footer-hint {
+      font-size: 11px;
+      color: #bbb;
+    }
+
+    /* ─── Error message ────────────────────────────────────────── */
+    .wf-field-error {
+      font-size: 11px;
+      color: #c00;
+      margin-top: 4px;
+    }
+
+    /* ─── Success toast ────────────────────────────────────────── */
+    .wf-toast {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 9px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wf-toast-check { color: #7c7; font-size: 14px; }
+
+    /* ─── Annotations ──────────────────────────────────────────── */
+    .wf-annotation-marker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px; height: 16px;
+      background: #1a6bb5;
+      color: white;
+      border-radius: 50%;
+      font-size: 9px;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-left: 4px;
+      cursor: default;
+    }
+    .wf-annotations {
+      margin-top: 48px;
+      border-top: 2px solid #ccc;
+      padding-top: 24px;
+      max-width: 720px;
+    }
+    .wf-annotations h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #777;
+      margin-bottom: 16px;
+    }
+    .wf-annotations ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wf-annotations li {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.5;
+    }
+    .wf-annotations li strong { color: #1a6bb5; }
+    .wf-req-tag {
+      font-size: 10px;
+      background: #e8f0fb;
+      color: #1a6bb5;
+      border: 1px solid #c0d4f0;
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* ─── Divider for optional section ────────────────────────── */
+    .wf-optional-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 12px;
+      font-size: 11px;
+      color: #bbb;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .wf-optional-divider::before,
+    .wf-optional-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Metadata ──────────────────────────────────────────────── -->
+  <div class="wf-meta">
+    <span><strong>Screen:</strong> Quick Capture Modal</span>
+    <span><strong>Feature:</strong> screenplay-idea-vault</span>
+    <span><strong>Version:</strong> 1</span>
+    <span><strong>Date:</strong> 2026-03-22</span>
+    <span><strong>Flows:</strong> Flow 2 (Quick Capture a New Idea)</span>
+    <span><strong>Requirements:</strong> FR-01, FR-02, FR-03, FR-04, FR-05, FR-06</span>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 1 — DEFAULT (empty, just opened)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 1 — Default (modal just opened)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-page-bg wf-page-dimmed">
+      <!-- Nav (dimmed behind overlay) -->
+      <div class="wf-page-nav" style="opacity:0.4">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <!-- Background content rows (dimmed) -->
+      <div class="wf-page-content-rows">
+        <div class="wf-content-row"></div>
+        <div class="wf-content-row"></div>
+        <div class="wf-content-row"></div>
+      </div>
+
+      <!-- MODAL OVERLAY -->
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <!-- Header -->
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">New Idea</span>
+              <span class="wf-modal-shortcut">N</span>
+              <span class="wf-annotation-marker">1</span>
+            </div>
+            <div class="wf-close-btn" title="Close (Esc)">✕</div>
+          </div>
+
+          <!-- Body -->
+          <div class="wf-modal-body">
+
+            <!-- Type selector -->
+            <div class="wf-field">
+              <label class="wf-label">
+                Idea Type <span class="wf-required">*</span>
+                <span class="wf-annotation-marker">2</span>
+              </label>
+              <div class="wf-type-pills">
+                <div class="wf-pill unset">No type yet</div>
+                <div class="wf-pill">What If</div>
+                <div class="wf-pill">Character</div>
+                <div class="wf-pill">Setting</div>
+                <div class="wf-pill">First Line</div>
+                <div class="wf-pill">Scene</div>
+                <div class="wf-pill">Theme</div>
+                <div class="wf-pill">News Flash</div>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="wf-field">
+              <label class="wf-label">
+                Idea <span class="wf-required">*</span>
+                <span class="wf-annotation-marker">3</span>
+              </label>
+              <div class="wf-textarea-wrap">
+                <textarea class="wf-textarea" readonly>What if a retired forensic linguist discovers their own voice in a hostage recording from 20 years ago...</textarea>
+                <div class="wf-voice-btn" title="Voice to text (FR-06)">🎙</div>
+              </div>
+            </div>
+
+            <!-- Optional section -->
+            <div class="wf-optional-divider">Optional</div>
+
+            <div class="wf-row-2col">
+              <div class="wf-field" style="margin-bottom:0">
+                <label class="wf-label">
+                  Project <span class="wf-optional">assign later</span>
+                  <span class="wf-annotation-marker">4</span>
+                </label>
+                <div class="wf-input" style="color:#bbb; display:flex; align-items:center; justify-content:space-between;">
+                  <span>— unassigned —</span><span style="color:#ccc">▾</span>
+                </div>
+              </div>
+              <div class="wf-field" style="margin-bottom:0">
+                <label class="wf-label">
+                  Tags <span class="wf-optional">comma separated</span>
+                </label>
+                <div class="wf-input" style="color:#bbb">e.g. cold-war, thriller</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Footer -->
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel <span class="wf-annotation-marker">5</span></span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary disabled">Save Idea</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 2 — FILLED (type selected + content entered, ready to save)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 2 — Filled (type selected, ready to save)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-page-bg wf-page-dimmed">
+      <div class="wf-page-nav" style="opacity:0.4">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-page-content-rows">
+        <div class="wf-content-row"></div>
+        <div class="wf-content-row"></div>
+        <div class="wf-content-row"></div>
+      </div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">New Idea</span>
+              <span class="wf-modal-shortcut">N</span>
+            </div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <div class="wf-field">
+              <label class="wf-label">Idea Type <span class="wf-required">*</span></label>
+              <div class="wf-type-pills">
+                <div class="wf-pill unset">No type yet</div>
+                <div class="wf-pill selected">What If</div>
+                <div class="wf-pill">Character</div>
+                <div class="wf-pill">Setting</div>
+                <div class="wf-pill">First Line</div>
+                <div class="wf-pill">Scene</div>
+                <div class="wf-pill">Theme</div>
+                <div class="wf-pill">News Flash</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <label class="wf-label">Idea <span class="wf-required">*</span></label>
+              <div class="wf-textarea-wrap">
+                <textarea class="wf-textarea filled" readonly>What if a retired forensic linguist discovers their own voice in a hostage recording from 20 years ago — a recording they have no memory of making?</textarea>
+                <div class="wf-voice-btn">🎙</div>
+              </div>
+            </div>
+
+            <div class="wf-optional-divider">Optional</div>
+
+            <div class="wf-row-2col">
+              <div class="wf-field" style="margin-bottom:0">
+                <label class="wf-label">Project <span class="wf-optional">assign later</span></label>
+                <div class="wf-input filled" style="display:flex; align-items:center; justify-content:space-between;">
+                  <span>The Linguist</span><span style="color:#999">▾</span>
+                </div>
+              </div>
+              <div class="wf-field" style="margin-bottom:0">
+                <label class="wf-label">Tags <span class="wf-optional">comma separated</span></label>
+                <div class="wf-input filled">thriller, memory, identity</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary">Save Idea</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 3 — VALIDATION ERROR (submitted with no content)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 3 — Validation error (saved without required Idea text)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-page-bg wf-page-dimmed">
+      <div class="wf-page-nav" style="opacity:0.4">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-page-content-rows">
+        <div class="wf-content-row"></div>
+        <div class="wf-content-row"></div>
+        <div class="wf-content-row"></div>
+      </div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">New Idea</span>
+              <span class="wf-modal-shortcut">N</span>
+            </div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <div class="wf-field">
+              <label class="wf-label">Idea Type <span class="wf-required">*</span></label>
+              <div class="wf-type-pills">
+                <div class="wf-pill unset">No type yet</div>
+                <div class="wf-pill selected">Character</div>
+                <div class="wf-pill">What If</div>
+                <div class="wf-pill">Setting</div>
+                <div class="wf-pill">First Line</div>
+                <div class="wf-pill">Scene</div>
+                <div class="wf-pill">Theme</div>
+                <div class="wf-pill">News Flash</div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <label class="wf-label">
+                Idea <span class="wf-required">*</span>
+                <span class="wf-annotation-marker" style="background:#c00">6</span>
+              </label>
+              <div class="wf-textarea-wrap">
+                <textarea class="wf-textarea error-state" readonly placeholder="Describe your idea…"></textarea>
+                <div class="wf-voice-btn">🎙</div>
+              </div>
+              <div class="wf-field-error">Idea text is required. What's on your mind?</div>
+            </div>
+
+            <div class="wf-optional-divider">Optional</div>
+
+            <div class="wf-row-2col">
+              <div class="wf-field" style="margin-bottom:0">
+                <label class="wf-label">Project <span class="wf-optional">assign later</span></label>
+                <div class="wf-input" style="color:#bbb; display:flex; align-items:center; justify-content:space-between;">
+                  <span>— unassigned —</span><span style="color:#ccc">▾</span>
+                </div>
+              </div>
+              <div class="wf-field" style="margin-bottom:0">
+                <label class="wf-label">Tags <span class="wf-optional">comma separated</span></label>
+                <div class="wf-input" style="color:#bbb">e.g. cold-war, thriller</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary">Save Idea</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 4 — SUCCESS (modal closed, toast visible)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 4 — Saved (modal dismissed, toast confirmation)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-page-bg">
+      <div class="wf-page-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <!-- New idea appears at top of list -->
+        <div class="wf-content-row" style="background:white; border:1px solid #bbb; border-radius:4px; padding: 10px 14px; opacity:1; display:flex; align-items:center; gap:12px;">
+          <div style="font-size:10px; font-weight:700; background:#eee; border:1px solid #ddd; padding:2px 7px; border-radius:10px; color:#555; white-space:nowrap;">WHAT IF</div>
+          <div style="font-size:12px; color:#333; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">What if a retired forensic linguist discovers their own voice in a hostage recording…</div>
+          <div style="font-size:11px; color:#bbb; white-space:nowrap;">just now</div>
+        </div>
+        <div class="wf-content-row" style="opacity:0.5"></div>
+        <div class="wf-content-row" style="opacity:0.5"></div>
+        <div class="wf-content-row" style="opacity:0.5"></div>
+      </div>
+      <!-- Toast -->
+      <div class="wf-toast">
+        <span class="wf-toast-check">✓</span>
+        Idea saved
+        <span style="color:#aaa; margin-left:8px; cursor:default; font-size:11px; text-decoration:underline;">View</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── Annotations ──────────────────────────────────────────── -->
+  <div class="wf-annotations">
+    <h2>Annotations</h2>
+    <ol>
+      <li>
+        <strong>[1] Global trigger mechanism</strong> —
+        The modal should be openable from any authenticated screen via: (a) the persistent FAB (+) button in the top nav, and (b) the keyboard shortcut <code>N</code>. The shortcut label appears next to the modal title as a discoverability nudge.
+        <span class="wf-req-tag">FR-05</span>
+      </li>
+      <li>
+        <strong>[2] Type selector as pills, not a dropdown</strong> —
+        There are exactly 7 types — pill buttons allow single-tap selection without opening a menu. "No type yet" is the default, shown dashed to signal it's a placeholder state.
+        Raw/untyped ideas are valid saves (FR-11 indicator will show on them in the list). The type field is technically REQUIRED per FR-01 but the UX should not block saving a raw idea.
+        <em>Decision needed: should a raw idea be saveable, or is type truly required?</em>
+        <span class="wf-req-tag">FR-02</span>
+        <span class="wf-req-tag">FR-11</span>
+      </li>
+      <li>
+        <strong>[3] Idea textarea autofocuses on open</strong> —
+        The cursor should land in the textarea immediately when the modal opens, so the user can start typing without clicking. The textarea is sized to ~4 lines — ideas are short by design.
+        Voice-to-text icon (🎙) sits bottom-right of the textarea and triggers the Web Speech API.
+        <span class="wf-req-tag">FR-01</span>
+        <span class="wf-req-tag">FR-06</span>
+      </li>
+      <li>
+        <strong>[4] Optional section below a visual divider</strong> —
+        Project and tags are separated by a faint "Optional" divider to communicate that the core action is type + content only. This keeps the modal feel lightweight. Project dropdown should populate from the user's existing projects (fetched on modal open).
+        <span class="wf-req-tag">FR-03</span>
+        <span class="wf-req-tag">FR-04</span>
+      </li>
+      <li>
+        <strong>[5] Keyboard dismissal</strong> —
+        Esc closes the modal without saving. The hint in the footer footer reinforces this. Clicking the backdrop (outside the modal) should also dismiss with no save.
+      </li>
+      <li>
+        <strong>[6] Validation — inline error, not toast</strong> —
+        Validation errors appear inline below the affected field, in red, with a human-readable message. The modal stays open. Error state uses a red border + light red background on the field.
+        <span class="wf-req-tag">NFR-02</span>
+      </li>
+      <li>
+        <strong>[7] Save button state</strong> —
+        The Save button is disabled (visually dimmed) when the idea text is empty. It becomes active as soon as content is entered. This prevents empty saves without blocking the UX with a hard error upfront.
+      </li>
+      <li>
+        <strong>[8] Post-save: modal closes + toast</strong> —
+        On successful save: modal dismisses, user returns to wherever they were, and a short toast confirms the save. The toast includes a "View" link to jump to the new idea's detail if needed. The new idea appears at the top of the Ideas List (most-recent sort).
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>

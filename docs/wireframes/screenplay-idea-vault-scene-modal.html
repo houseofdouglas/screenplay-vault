@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Add/Edit Scene Modal — Screenplay Idea Vault</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      background: #e8e8e8;
+      color: #222;
+      padding: 32px 24px 64px;
+    }
+
+    /* ─── Meta ──────────────────────────────────────────────────── */
+    .wf-meta {
+      font-size: 11px; color: #888;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px; margin-bottom: 28px;
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .wf-meta strong { color: #555; }
+
+    /* ─── State labels ──────────────────────────────────────────── */
+    .wf-state-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #666;
+      margin: 40px 0 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wf-state-label::after { content: ''; flex: 1; height: 1px; background: #ccc; }
+
+    /* ─── Viewport ──────────────────────────────────────────────── */
+    .wf-viewport {
+      background: #b0b0b0; border-radius: 6px;
+      overflow: hidden; border: 1px solid #999;
+    }
+    .wf-browser-chrome {
+      background: #d4d4d4; border-bottom: 1px solid #bbb;
+      padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .wf-traffic-lights { display: flex; gap: 5px; }
+    .wf-traffic-lights span {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #bbb; border: 1px solid #aaa;
+    }
+    .wf-url-bar {
+      flex: 1; background: white; border: 1px solid #bbb;
+      border-radius: 3px; padding: 3px 8px; font-size: 11px; color: #666;
+    }
+
+    /* ─── App shell ─────────────────────────────────────────────── */
+    .wf-app {
+      background: #f5f5f5; min-height: 520px;
+      display: flex; flex-direction: column;
+    }
+    .wf-nav {
+      background: white; border-bottom: 1px solid #ddd;
+      padding: 0 20px; height: 50px;
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    .wf-nav-logo {
+      font-weight: 800; font-size: 13px; color: #777;
+      background: #eee; padding: 5px 9px; border-radius: 4px; margin-right: 12px;
+    }
+    .wf-nav-link { font-size: 13px; color: #aaa; padding: 6px 10px; border-radius: 4px; cursor: default; }
+    .wf-nav-link.active { background: #f0f0f0; color: #333; font-weight: 600; }
+    .wf-nav-spacer { flex: 1; }
+    .wf-fab {
+      width: 32px; height: 32px; background: #444; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 20px; font-weight: 300; cursor: default;
+    }
+
+    /* ─── Project header stub (behind modal) ────────────────────── */
+    .wf-project-stub {
+      background: white; border-bottom: 1px solid #ddd;
+      padding: 14px 24px 0; opacity: 0.35;
+    }
+    .wf-stub-title { font-size: 18px; font-weight: 700; color: #555; margin-bottom: 10px; }
+    .wf-stub-tabs { display: flex; gap: 0; }
+    .wf-stub-tab {
+      padding: 8px 16px; font-size: 13px; color: #bbb;
+      border-bottom: 2px solid transparent;
+    }
+    .wf-stub-tab.active { color: #444; border-bottom-color: #555; font-weight: 600; }
+
+    /* ─── Modal overlay ─────────────────────────────────────────── */
+    .wf-modal-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .wf-modal {
+      background: white; border: 1px solid #ccc; border-radius: 6px;
+      width: 100%; max-width: 560px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .wf-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px 12px; border-bottom: 1px solid #eee;
+    }
+    .wf-modal-title { font-size: 15px; font-weight: 700; color: #222; }
+    .wf-modal-subtitle {
+      font-size: 11px; color: #bbb; font-weight: 400;
+      margin-left: 8px;
+    }
+    .wf-close-btn {
+      width: 26px; height: 26px; background: #f0f0f0;
+      border: 1px solid #ddd; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #777; cursor: default;
+    }
+    .wf-modal-body { padding: 16px 18px; }
+    .wf-modal-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 18px 14px; border-top: 1px solid #eee;
+    }
+
+    /* ─── Form elements ─────────────────────────────────────────── */
+    .wf-field { margin-bottom: 16px; }
+    .wf-field:last-child { margin-bottom: 0; }
+    .wf-label {
+      display: flex; align-items: baseline; gap: 4px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #666; margin-bottom: 5px;
+    }
+    .wf-required { color: #c00; }
+    .wf-optional { font-weight: 400; text-transform: none; color: #bbb; letter-spacing: 0; font-size: 10px; }
+    .wf-helper { font-size: 11px; color: #aaa; margin-top: 4px; font-style: italic; }
+    .wf-input {
+      width: 100%; border: 1px solid #ccc; border-radius: 4px;
+      padding: 8px 10px; font-size: 13px; color: #888; background: white;
+    }
+    .wf-input.filled { color: #222; }
+    .wf-input.error-state { border-color: #c00; background: #fff8f8; }
+    .wf-textarea {
+      width: 100%; border: 1px solid #ccc; border-radius: 4px;
+      padding: 8px 10px; font-size: 13px; color: #888;
+      background: white; resize: none; display: block;
+    }
+    .wf-textarea.filled { color: #222; }
+    .wf-textarea.error-state { border-color: #c00; background: #fff8f8; }
+    .wf-field-error { font-size: 11px; color: #c00; margin-top: 4px; }
+
+    /* ─── Act position selector ─────────────────────────────────── */
+    .wf-act-pills { display: flex; gap: 8px; }
+    .wf-act-pill {
+      padding: 6px 14px; border: 1px solid #ccc; border-radius: 20px;
+      font-size: 12px; font-weight: 600; color: #666;
+      background: white; cursor: default;
+    }
+    .wf-act-pill.selected { background: #444; color: white; border-color: #444; }
+    .wf-act-pill.unset { border-style: dashed; color: #bbb; }
+
+    /* ─── Promoted-from banner ──────────────────────────────────── */
+    .wf-promote-banner {
+      background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;
+      padding: 10px 12px; margin-bottom: 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .wf-promote-icon { font-size: 14px; color: #999; flex-shrink: 0; margin-top: 1px; }
+    .wf-promote-label { font-size: 11px; font-weight: 700; color: #888; margin-bottom: 3px; }
+    .wf-promote-content { font-size: 12px; color: #555; line-height: 1.4; font-style: italic; }
+
+    /* ─── Archive/delete row ────────────────────────────────────── */
+    .wf-danger-zone {
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .wf-danger-link { font-size: 11px; color: #c00; text-decoration: underline; cursor: default; }
+
+    /* ─── Buttons ───────────────────────────────────────────────── */
+    .wf-btn {
+      padding: 8px 16px; border-radius: 4px; font-size: 13px;
+      font-weight: 600; cursor: default; display: inline-flex;
+      align-items: center; gap: 4px;
+    }
+    .wf-btn-ghost { background: white; border: 1px solid #ccc; color: #555; }
+    .wf-btn-primary { background: #333; border: 1px solid #222; color: white; }
+    .wf-btn-primary.disabled { background: #bbb; border-color: #bbb; color: #eee; }
+    .wf-footer-hint { font-size: 11px; color: #bbb; }
+
+    /* ─── Annotation markers ────────────────────────────────────── */
+    .ann {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; background: #1a6bb5; color: white;
+      border-radius: 50%; font-size: 9px; font-weight: 700;
+      vertical-align: middle; margin-left: 4px; cursor: default;
+      flex-shrink: 0;
+    }
+
+    /* ─── Annotations section ───────────────────────────────────── */
+    .wf-annotations {
+      margin-top: 48px; border-top: 2px solid #ccc;
+      padding-top: 24px; max-width: 720px;
+    }
+    .wf-annotations h2 {
+      font-size: 13px; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #777; margin-bottom: 16px;
+    }
+    .wf-annotations ol { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .wf-annotations li { font-size: 13px; color: #444; line-height: 1.5; }
+    .wf-annotations li strong { color: #1a6bb5; }
+    .req {
+      font-size: 10px; background: #e8f0fb; color: #1a6bb5;
+      border: 1px solid #c0d4f0; border-radius: 3px;
+      padding: 1px 5px; margin-left: 4px; vertical-align: middle;
+    }
+
+    /* relative wrapper for modal overlay */
+    .wf-relative { position: relative; }
+  </style>
+</head>
+<body>
+
+  <div class="wf-meta">
+    <span><strong>Screen:</strong> Add / Edit Scene Modal</span>
+    <span><strong>Feature:</strong> screenplay-idea-vault</span>
+    <span><strong>Version:</strong> 1</span>
+    <span><strong>Date:</strong> 2026-03-22</span>
+    <span><strong>Flows:</strong> Flow 7 (Add Scene), Flow 10 (Promote What-If → Scene)</span>
+    <span><strong>Requirements:</strong> FR-20, FR-21, FR-22</span>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 1 — ADD NEW SCENE (empty, default)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 1 — Add new scene (empty)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/projects/the-linguist/scenes</div>
+    </div>
+    <div class="wf-app wf-relative">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link">Ideas</div>
+        <div class="wf-nav-link active">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-project-stub">
+        <div class="wf-stub-title">The Linguist</div>
+        <div class="wf-stub-tabs">
+          <div class="wf-stub-tab">Ideas</div>
+          <div class="wf-stub-tab">Characters</div>
+          <div class="wf-stub-tab active">Scenes</div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">Add Scene</span>
+              <span class="wf-modal-subtitle">The Linguist</span>
+            </div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <!-- Description -->
+            <div class="wf-field">
+              <div class="wf-label">
+                Scene description <span class="wf-required">*</span>
+                <span class="ann">1</span>
+              </div>
+              <textarea class="wf-textarea" style="height:80px;" readonly
+                placeholder="INT. / EXT. LOCATION — TIME. Action. What happens."></textarea>
+              <div class="wf-helper">Action line only — no internal thought, no prose.</div>
+            </div>
+
+            <!-- Dialogue snippet -->
+            <div class="wf-field">
+              <div class="wf-label">
+                Dialogue snippet <span class="wf-optional">optional</span>
+                <span class="ann">2</span>
+              </div>
+              <textarea class="wf-textarea" style="height:60px;" readonly
+                placeholder='"A key line of dialogue that belongs in this scene."'></textarea>
+            </div>
+
+            <!-- Act position -->
+            <div class="wf-field">
+              <div class="wf-label">
+                Act position <span class="wf-optional">optional</span>
+                <span class="ann">3</span>
+              </div>
+              <div class="wf-act-pills">
+                <div class="wf-act-pill unset">Not placed yet</div>
+                <div class="wf-act-pill">Act 1</div>
+                <div class="wf-act-pill">Act 2</div>
+                <div class="wf-act-pill">Act 3</div>
+              </div>
+              <div class="wf-helper">Rough placement only — you can change this any time.</div>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary disabled">Save Scene</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 2 — FILLED (ready to save)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 2 — Filled (Act 2, with dialogue)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/projects/the-linguist/scenes</div>
+    </div>
+    <div class="wf-app wf-relative">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link">Ideas</div>
+        <div class="wf-nav-link active">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-project-stub">
+        <div class="wf-stub-title">The Linguist</div>
+        <div class="wf-stub-tabs">
+          <div class="wf-stub-tab">Ideas</div>
+          <div class="wf-stub-tab">Characters</div>
+          <div class="wf-stub-tab active">Scenes</div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">Add Scene</span>
+              <span class="wf-modal-subtitle">The Linguist</span>
+            </div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <div class="wf-field">
+              <div class="wf-label">Scene description <span class="wf-required">*</span></div>
+              <textarea class="wf-textarea filled" style="height:80px;" readonly
+              >INT. RECORDS VAULT — NIGHT. She plays the tape for the 40th time. Her lips move silently along with it. The reel turns. Nothing changes.</textarea>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Dialogue snippet <span class="wf-optional">optional</span></div>
+              <textarea class="wf-textarea filled" style="height:60px;" readonly
+              >"It's not a recording. It's a mirror."</textarea>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Act position <span class="wf-optional">optional</span></div>
+              <div class="wf-act-pills">
+                <div class="wf-act-pill unset">Not placed yet</div>
+                <div class="wf-act-pill">Act 1</div>
+                <div class="wf-act-pill selected">Act 2</div>
+                <div class="wf-act-pill">Act 3</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary">Save Scene</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 3 — PROMOTED FROM WHAT-IF (FR-22)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 3 — Promoted from a What-If idea (FR-22) <span class="ann" style="background:#555">4</span></div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/projects/the-linguist/scenes</div>
+    </div>
+    <div class="wf-app wf-relative">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link">Ideas</div>
+        <div class="wf-nav-link active">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-project-stub">
+        <div class="wf-stub-title">The Linguist</div>
+        <div class="wf-stub-tabs">
+          <div class="wf-stub-tab">Ideas</div>
+          <div class="wf-stub-tab">Characters</div>
+          <div class="wf-stub-tab active">Scenes</div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">Promote to Scene</span>
+              <span class="wf-modal-subtitle">from What-If idea</span>
+            </div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <!-- Source idea banner -->
+            <div class="wf-promote-banner">
+              <div class="wf-promote-icon">↑</div>
+              <div>
+                <div class="wf-promote-label">Promoting from: WHAT IF idea</div>
+                <div class="wf-promote-content">
+                  "What if the linguist's ability to identify voices starts working in reverse — she forgets how to recognise her own?"
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">
+                Scene description <span class="wf-required">*</span>
+                <span class="ann">5</span>
+              </div>
+              <textarea class="wf-textarea filled" style="height:80px;" readonly
+              >What if the linguist's ability to identify voices starts working in reverse — she forgets how to recognise her own?</textarea>
+              <div class="wf-helper">Edit into a proper action line: INT./EXT. LOCATION — TIME. What happens.</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Dialogue snippet <span class="wf-optional">optional</span></div>
+              <textarea class="wf-textarea" style="height:60px;" readonly
+                placeholder='"A key line of dialogue that belongs in this scene."'></textarea>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Act position <span class="wf-optional">optional</span></div>
+              <div class="wf-act-pills">
+                <div class="wf-act-pill unset">Not placed yet</div>
+                <div class="wf-act-pill">Act 1</div>
+                <div class="wf-act-pill">Act 2</div>
+                <div class="wf-act-pill">Act 3</div>
+              </div>
+            </div>
+
+            <!-- Archive original option -->
+            <div class="wf-danger-zone">
+              <input type="checkbox" id="archive-orig" style="cursor:default;">
+              <label for="archive-orig" style="font-size:12px; color:#777; cursor:default;">
+                Archive the original What-If idea after saving
+                <span class="ann">6</span>
+              </label>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary">Save Scene</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 4 — EDIT EXISTING SCENE
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 4 — Edit existing scene</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/projects/the-linguist/scenes</div>
+    </div>
+    <div class="wf-app wf-relative">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link">Ideas</div>
+        <div class="wf-nav-link active">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-project-stub">
+        <div class="wf-stub-title">The Linguist</div>
+        <div class="wf-stub-tabs">
+          <div class="wf-stub-tab">Ideas</div>
+          <div class="wf-stub-tab">Characters</div>
+          <div class="wf-stub-tab active">Scenes</div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div>
+              <span class="wf-modal-title">Edit Scene</span>
+              <span class="wf-modal-subtitle">The Linguist · Act 2</span>
+            </div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <div class="wf-field">
+              <div class="wf-label">Scene description <span class="wf-required">*</span></div>
+              <textarea class="wf-textarea filled" style="height:80px;" readonly
+              >INT. RECORDS VAULT — NIGHT. She plays the tape for the 40th time. Her lips move silently along with it. The reel turns. Nothing changes.</textarea>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Dialogue snippet <span class="wf-optional">optional</span></div>
+              <textarea class="wf-textarea filled" style="height:60px;" readonly
+              >"It's not a recording. It's a mirror."</textarea>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Act position <span class="wf-optional">optional</span></div>
+              <div class="wf-act-pills">
+                <div class="wf-act-pill unset">Not placed yet</div>
+                <div class="wf-act-pill">Act 1</div>
+                <div class="wf-act-pill selected">Act 2</div>
+                <div class="wf-act-pill">Act 3</div>
+              </div>
+            </div>
+
+            <!-- Delete scene (destructive, below divider) -->
+            <div class="wf-danger-zone">
+              <span class="wf-danger-link">Delete this scene…</span>
+              <span class="ann">7</span>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary">Save Changes</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 5 — VALIDATION ERROR
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 5 — Validation error (empty description)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/projects/the-linguist/scenes</div>
+    </div>
+    <div class="wf-app wf-relative">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link">Ideas</div>
+        <div class="wf-nav-link active">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-project-stub">
+        <div class="wf-stub-title">The Linguist</div>
+        <div class="wf-stub-tabs">
+          <div class="wf-stub-tab">Ideas</div>
+          <div class="wf-stub-tab">Characters</div>
+          <div class="wf-stub-tab active">Scenes</div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+
+      <div class="wf-modal-overlay">
+        <div class="wf-modal">
+
+          <div class="wf-modal-header">
+            <div><span class="wf-modal-title">Add Scene</span><span class="wf-modal-subtitle">The Linguist</span></div>
+            <div class="wf-close-btn">✕</div>
+          </div>
+
+          <div class="wf-modal-body">
+
+            <div class="wf-field">
+              <div class="wf-label">Scene description <span class="wf-required">*</span></div>
+              <textarea class="wf-textarea error-state" style="height:80px;" readonly
+                placeholder="INT. / EXT. LOCATION — TIME. Action. What happens."></textarea>
+              <div class="wf-field-error">Scene description is required — write it as an action line.</div>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Dialogue snippet <span class="wf-optional">optional</span></div>
+              <textarea class="wf-textarea" style="height:60px;" readonly placeholder='"A key line of dialogue."'></textarea>
+            </div>
+
+            <div class="wf-field">
+              <div class="wf-label">Act position <span class="wf-optional">optional</span></div>
+              <div class="wf-act-pills">
+                <div class="wf-act-pill unset">Not placed yet</div>
+                <div class="wf-act-pill selected">Act 1</div>
+                <div class="wf-act-pill">Act 2</div>
+                <div class="wf-act-pill">Act 3</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="wf-modal-footer">
+            <span class="wf-footer-hint">Esc to cancel</span>
+            <div style="display:flex; gap:8px;">
+              <button class="wf-btn wf-btn-ghost">Cancel</button>
+              <button class="wf-btn wf-btn-primary">Save Scene</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── Annotations ──────────────────────────────────────────── -->
+  <div class="wf-annotations">
+    <h2>Annotations</h2>
+    <ol>
+      <li>
+        <strong>[1] Description field: action line, not prose</strong> —
+        The placeholder text shows the INT./EXT. format to immediately prime the correct input style. The helper text below the field reinforces this: "Action line only — no internal thought, no prose." This is a key craft constraint (BR-03) that the UI should actively teach.
+        <span class="req">FR-20</span>
+        <span class="req">BR-03</span>
+      </li>
+      <li>
+        <strong>[2] Dialogue snippet is optional and secondary</strong> —
+        Placed after the description and clearly marked optional. The placeholder uses quotes to signal the expected format. A scene without dialogue is valid and common.
+        <span class="req">FR-20</span>
+      </li>
+      <li>
+        <strong>[3] Act position as 4-way pill: Unplaced + Act 1/2/3</strong> —
+        "Not placed yet" is the default (dashed pill). This is not an error state — unplaced scenes are first-class. Clicking a pill selects it; clicking the selected pill deselects back to "Not placed yet."
+        <span class="req">FR-20</span>
+        <span class="req">FR-21</span>
+      </li>
+      <li>
+        <strong>[4] Promoted-from banner makes the source idea visible</strong> —
+        When opened via "Promote to Scene" (FR-22), the modal shows the original What-If idea in a light banner at the top. This keeps the context visible while the user rewrites the description into proper action-line format. The modal title changes to "Promote to Scene" to signal the different entry path.
+        <span class="req">FR-22</span>
+      </li>
+      <li>
+        <strong>[5] Pre-filled description from What-If — must be edited</strong> —
+        The description textarea is pre-populated with the What-If content but highlighted as needing revision (helper text: "Edit into a proper action line"). The Save button is active immediately — user can save as-is if they choose — but the UI nudges toward proper format.
+        <span class="req">FR-22</span>
+      </li>
+      <li>
+        <strong>[6] "Archive original" checkbox on promote flow</strong> —
+        Lets the user clean up in one step: save the new scene and archive the source idea simultaneously. Unchecked by default — the original idea is kept unless explicitly dismissed.
+        <span class="req">FR-13</span>
+        <span class="req">FR-22</span>
+      </li>
+      <li>
+        <strong>[7] Delete scene is a danger-zone link, not a button</strong> —
+        In edit mode, "Delete this scene…" appears below a divider in red. It's an underlined link, not a button — this reduces accidental taps. Clicking it should open a confirmation step before executing. Scene deletion is permanent (unlike idea archiving which is soft).
+        <em>Decision needed: should scene deletion be permanent or soft-archivable? The requirements don't specify.</em>
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>

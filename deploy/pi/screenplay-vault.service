@@ -1,0 +1,21 @@
+[Unit]
+Description=Screenplay Vault — local-network server
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Code/Hobby/screenplay-vault-idea
+
+# node is installed via nvm — use the absolute path so systemd (which does
+# not source ~/.bashrc) can find it without any PATH manipulation.
+ExecStart=/home/pi/.nvm/versions/node/v25.1.0/bin/node --env-file=packages/backend/.env.pi packages/backend/dist/pi/server.js
+
+Restart=on-failure
+RestartSec=5s
+
+# Minimal environment; the .env.pi file supplies NODE_ENV, DEV_USER_ID, PORT.
+Environment=PATH=/home/pi/.nvm/versions/node/v25.1.0/bin:/usr/bin:/usr/local/bin
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Idea Detail — Screenplay Idea Vault</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; background: #e8e8e8; color: #222;
+      padding: 32px 24px 64px;
+    }
+
+    /* ─── Meta ──────────────────────────────────────────────────── */
+    .wf-meta {
+      font-size: 11px; color: #888; border-bottom: 1px solid #ccc;
+      padding-bottom: 10px; margin-bottom: 28px;
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .wf-meta strong { color: #555; }
+
+    /* ─── State labels ──────────────────────────────────────────── */
+    .wf-state-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #666; margin: 40px 0 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wf-state-label::after { content: ''; flex: 1; height: 1px; background: #ccc; }
+
+    /* ─── Viewport ──────────────────────────────────────────────── */
+    .wf-viewport { background: #b0b0b0; border-radius: 6px; overflow: hidden; border: 1px solid #999; }
+    .wf-browser-chrome {
+      background: #d4d4d4; border-bottom: 1px solid #bbb;
+      padding: 8px 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .wf-traffic-lights { display: flex; gap: 5px; }
+    .wf-traffic-lights span { width: 10px; height: 10px; border-radius: 50%; background: #bbb; border: 1px solid #aaa; }
+    .wf-url-bar { flex: 1; background: white; border: 1px solid #bbb; border-radius: 3px; padding: 3px 8px; font-size: 11px; color: #666; }
+
+    /* ─── App shell ─────────────────────────────────────────────── */
+    .wf-app { background: #f5f5f5; min-height: 580px; display: flex; flex-direction: column; }
+    .wf-nav {
+      background: white; border-bottom: 1px solid #ddd;
+      padding: 0 20px; height: 50px;
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    .wf-nav-logo { font-weight: 800; font-size: 13px; color: #777; background: #eee; padding: 5px 9px; border-radius: 4px; margin-right: 12px; }
+    .wf-nav-link { font-size: 13px; color: #aaa; padding: 6px 10px; border-radius: 4px; cursor: default; }
+    .wf-nav-link.active { background: #f0f0f0; color: #333; font-weight: 600; }
+    .wf-nav-spacer { flex: 1; }
+    .wf-fab { width: 32px; height: 32px; background: #444; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 300; cursor: default; }
+
+    /* ─── Page layout ───────────────────────────────────────────── */
+    .wf-page { display: flex; flex: 1; }
+
+    /* ─── Breadcrumb + page header ──────────────────────────────── */
+    .wf-page-header {
+      background: white; border-bottom: 1px solid #e8e8e8;
+      padding: 10px 24px 10px;
+    }
+    .wf-breadcrumb {
+      font-size: 11px; color: #bbb; display: flex; align-items: center; gap: 5px; margin-bottom: 0;
+    }
+    .wf-breadcrumb a { color: #888; text-decoration: underline; cursor: default; }
+    .wf-breadcrumb-sep { color: #ccc; }
+
+    /* ─── Main content + sidebar layout ────────────────────────── */
+    .wf-detail-layout {
+      display: flex; flex: 1; gap: 0;
+    }
+
+    /* Primary content */
+    .wf-detail-main {
+      flex: 1; padding: 24px; min-width: 0;
+    }
+
+    /* Right metadata panel */
+    .wf-detail-sidebar {
+      width: 220px; flex-shrink: 0;
+      background: white; border-left: 1px solid #e8e8e8;
+      padding: 20px 16px;
+    }
+
+    /* ─── Type badge & title area ───────────────────────────────── */
+    .wf-idea-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 12px; margin-bottom: 16px;
+    }
+    .wf-type-badge {
+      display: inline-block; font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      background: #f0f0f0; border: 1px solid #ddd;
+      border-radius: 3px; padding: 3px 8px; color: #555; white-space: nowrap;
+    }
+    .wf-type-badge.raw { background: white; border-style: dashed; border-color: #ccc; color: #bbb; }
+    .wf-idea-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* Content area — editable inline */
+    .wf-idea-content {
+      font-size: 15px; color: #222; line-height: 1.6;
+      border: 1px solid transparent; border-radius: 4px;
+      padding: 8px; margin: -8px; margin-bottom: 8px;
+      min-height: 80px;
+    }
+    .wf-idea-content.editing {
+      border-color: #999; background: white;
+    }
+    .wf-edit-hint { font-size: 11px; color: #ccc; margin-bottom: 16px; }
+
+    /* Stale / raw banners */
+    .wf-banner {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-radius: 4px;
+      font-size: 12px; margin-bottom: 16px;
+      border: 1px solid #ddd; background: #fafafa; color: #666;
+    }
+    .wf-banner-icon { font-size: 14px; }
+    .wf-banner-action { margin-left: auto; font-size: 11px; color: #555; text-decoration: underline; cursor: default; }
+
+    /* Tags */
+    .wf-tags-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 16px; }
+    .wf-tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      background: #f0f0f0; border: 1px solid #e0e0e0;
+      border-radius: 3px; padding: 3px 8px; font-size: 12px; color: #555;
+    }
+    .wf-tag-remove { font-size: 10px; color: #bbb; cursor: default; }
+    .wf-add-tag {
+      border: 1px dashed #ccc; border-radius: 3px;
+      padding: 3px 8px; font-size: 12px; color: #bbb; cursor: default;
+    }
+
+    /* Activity log */
+    .wf-section-heading {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #bbb; margin-bottom: 8px;
+    }
+    .wf-activity { display: flex; flex-direction: column; gap: 6px; }
+    .wf-activity-item { font-size: 11px; color: #aaa; display: flex; gap: 8px; }
+    .wf-activity-date { flex-shrink: 0; color: #ccc; }
+
+    /* ─── Sidebar metadata ──────────────────────────────────────── */
+    .wf-meta-field { margin-bottom: 18px; }
+    .wf-meta-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: #bbb; margin-bottom: 6px;
+    }
+    .wf-meta-value { font-size: 13px; color: #444; line-height: 1.4; }
+    .wf-meta-value.empty { color: #ccc; font-style: italic; }
+    .wf-meta-link { font-size: 11px; color: #777; text-decoration: underline; cursor: default; }
+
+    /* Excitement widget */
+    .wf-excitement-widget { display: flex; gap: 6px; align-items: center; }
+    .wf-exc-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1px solid #ccc; background: #f5f5f5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; cursor: default;
+    }
+    .wf-exc-dot.on { background: #444; border-color: #333; }
+    .wf-exc-label { font-size: 11px; color: #bbb; margin-left: 4px; }
+
+    /* Project picker */
+    .wf-project-select {
+      width: 100%; border: 1px solid #ddd; border-radius: 4px;
+      padding: 6px 8px; font-size: 12px; color: #444;
+      background: white; display: flex; align-items: center; justify-content: space-between;
+      cursor: default;
+    }
+    .wf-project-select.empty { color: #bbb; }
+
+    /* Danger zone in sidebar */
+    .wf-sidebar-danger {
+      margin-top: 24px; padding-top: 16px; border-top: 1px solid #f0f0f0;
+    }
+    .wf-danger-link { font-size: 11px; color: #c00; text-decoration: underline; cursor: default; display: block; margin-bottom: 6px; }
+
+    /* ─── Buttons ───────────────────────────────────────────────── */
+    .wf-btn {
+      padding: 6px 12px; border-radius: 4px; font-size: 12px;
+      font-weight: 600; cursor: default; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .wf-btn-ghost { background: white; border: 1px solid #ccc; color: #555; }
+    .wf-btn-primary { background: #333; border: 1px solid #222; color: white; }
+    .wf-btn-sm { padding: 4px 9px; font-size: 11px; }
+    .wf-icon-btn {
+      width: 28px; height: 28px; background: #f5f5f5; border: 1px solid #e8e8e8;
+      border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: #888; cursor: default;
+    }
+    .wf-icon-btn.active { background: #333; border-color: #222; color: white; }
+
+    /* Nav arrows (prev/next idea) */
+    .wf-idea-nav { display: flex; gap: 4px; }
+
+    /* ─── Annotations ───────────────────────────────────────────── */
+    .ann {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; background: #1a6bb5; color: white;
+      border-radius: 50%; font-size: 9px; font-weight: 700;
+      vertical-align: middle; margin-left: 4px; cursor: default; flex-shrink: 0;
+    }
+    .wf-annotations { margin-top: 48px; border-top: 2px solid #ccc; padding-top: 24px; max-width: 760px; }
+    .wf-annotations h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #777; margin-bottom: 16px; }
+    .wf-annotations ol { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .wf-annotations li { font-size: 13px; color: #444; line-height: 1.5; }
+    .wf-annotations li strong { color: #1a6bb5; }
+    .req { font-size: 10px; background: #e8f0fb; color: #1a6bb5; border: 1px solid #c0d4f0; border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+  <div class="wf-meta">
+    <span><strong>Screen:</strong> Idea Detail</span>
+    <span><strong>Feature:</strong> screenplay-idea-vault</span>
+    <span><strong>Version:</strong> 1</span>
+    <span><strong>Date:</strong> 2026-03-22</span>
+    <span><strong>Flows:</strong> Flow 3 (Browse &amp; Review), Flow 8 (Archive), Flow 9 (Assign to Project), Flow 10 (Promote → Scene)</span>
+    <span><strong>Requirements:</strong> FR-01–FR-04, FR-10–FR-13, FR-22</span>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 1 — DEFAULT: stale WHAT-IF idea, assigned to project
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 1 — Default: stale What-If idea, assigned to project</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas/idea_abc123</div>
+    </div>
+    <div class="wf-app">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+
+      <!-- Breadcrumb bar -->
+      <div class="wf-page-header">
+        <div class="wf-breadcrumb">
+          <a>Ideas</a>
+          <span class="wf-breadcrumb-sep">›</span>
+          <span>What if a retired forensic linguist…</span>
+          <span style="flex:1;"></span>
+          <!-- Prev / next navigation -->
+          <div class="wf-idea-nav">
+            <div class="wf-icon-btn" title="Previous idea">‹</div>
+            <div class="wf-icon-btn" title="Next idea">›</div>
+          </div>
+          <span class="ann">1</span>
+        </div>
+      </div>
+
+      <div class="wf-detail-layout">
+
+        <!-- Main content -->
+        <div class="wf-detail-main">
+
+          <!-- Stale banner -->
+          <div class="wf-banner">
+            <span class="wf-banner-icon">⚠</span>
+            <span>Last reviewed <strong>21 days ago</strong> — does this still excite you?</span>
+            <span class="wf-banner-action">Mark as reviewed</span>
+            <span class="ann">2</span>
+          </div>
+
+          <!-- Type + actions row -->
+          <div class="wf-idea-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="wf-type-badge">WHAT IF</div>
+              <span style="font-size:11px; color:#bbb;">Added Mar 1 · Added by you</span>
+            </div>
+            <div class="wf-idea-actions">
+              <div class="wf-icon-btn" title="Promote to Scene">↑</div>
+              <div class="wf-icon-btn" title="More actions">⋯</div>
+              <span class="ann">3</span>
+            </div>
+          </div>
+
+          <!-- Idea content (inline editable) -->
+          <div class="wf-idea-content">
+            What if a retired forensic linguist discovers her own voice in a 20-year-old hostage recording she has no memory of making?
+          </div>
+          <div class="wf-edit-hint">Click to edit <span class="ann">4</span></div>
+
+          <!-- Tags -->
+          <div class="wf-tags-row">
+            <div class="wf-tag">thriller <span class="wf-tag-remove">✕</span></div>
+            <div class="wf-tag">memory <span class="wf-tag-remove">✕</span></div>
+            <div class="wf-tag">identity <span class="wf-tag-remove">✕</span></div>
+            <div class="wf-add-tag">+ add tag</div>
+            <span class="ann">5</span>
+          </div>
+
+          <!-- Activity log -->
+          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee;">
+            <div class="wf-section-heading">History</div>
+            <div class="wf-activity">
+              <div class="wf-activity-item"><span class="wf-activity-date">Mar 1</span><span>Idea captured</span></div>
+              <div class="wf-activity-item"><span class="wf-activity-date">Mar 3</span><span>Assigned to <em>The Linguist</em></span></div>
+              <div class="wf-activity-item"><span class="wf-activity-date">Mar 3</span><span>Excitement set to 3</span></div>
+              <div class="wf-activity-item"><span class="wf-activity-date">Mar 3</span><span>Last reviewed</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sidebar metadata panel -->
+        <div class="wf-detail-sidebar">
+
+          <!-- Excitement rating -->
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Excitement <span class="ann">6</span></div>
+            <div class="wf-excitement-widget">
+              <div class="wf-exc-dot on">●</div>
+              <div class="wf-exc-dot on">●</div>
+              <div class="wf-exc-dot on">●</div>
+              <span class="wf-exc-label">3 / 3</span>
+            </div>
+          </div>
+
+          <!-- Project -->
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Project <span class="ann">7</span></div>
+            <div class="wf-project-select">
+              <span>The Linguist</span>
+              <span style="color:#ccc;">▾</span>
+            </div>
+          </div>
+
+          <!-- Type (changeable) -->
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Type <span class="ann">8</span></div>
+            <div class="wf-project-select">
+              <span>What If</span>
+              <span style="color:#ccc;">▾</span>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Added</div>
+            <div class="wf-meta-value">March 1, 2026</div>
+          </div>
+
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Last reviewed</div>
+            <div class="wf-meta-value" style="color:#c00;">March 1, 2026 <span style="font-size:10px;">(21 days)</span></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Actions</div>
+            <button class="wf-btn wf-btn-ghost wf-btn-sm" style="width:100%; justify-content:center; margin-bottom:6px;">Promote to Scene…</button>
+          </div>
+
+          <!-- Danger zone -->
+          <div class="wf-sidebar-danger">
+            <a class="wf-danger-link">Archive idea…</a>
+          </div>
+          <span class="ann">9</span>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 2 — RAW / UNTYPED IDEA
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 2 — Raw / untyped idea (no type, no project)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas/idea_def456</div>
+    </div>
+    <div class="wf-app">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+
+      <div class="wf-page-header">
+        <div class="wf-breadcrumb">
+          <a>Ideas</a>
+          <span class="wf-breadcrumb-sep">›</span>
+          <span>Something about the way grief makes you mishear things…</span>
+          <span style="flex:1;"></span>
+          <div class="wf-idea-nav">
+            <div class="wf-icon-btn">‹</div>
+            <div class="wf-icon-btn">›</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-detail-layout">
+        <div class="wf-detail-main">
+
+          <!-- Raw banner -->
+          <div class="wf-banner">
+            <span class="wf-banner-icon">◌</span>
+            <span>This idea has no type — give it one to organise your vault.</span>
+            <span class="wf-banner-action">Set type now</span>
+          </div>
+
+          <div class="wf-idea-header">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="wf-type-badge raw">UNTYPED</div>
+              <span style="font-size:11px; color:#bbb;">Added Mar 15</span>
+            </div>
+            <div class="wf-idea-actions">
+              <div class="wf-icon-btn">⋯</div>
+            </div>
+          </div>
+
+          <div class="wf-idea-content">
+            Something about the way grief makes you mishear things — like phantom phone calls from the dead. There's a story in that dislocation.
+          </div>
+          <div class="wf-edit-hint">Click to edit</div>
+
+          <div class="wf-tags-row">
+            <div class="wf-add-tag">+ add tag</div>
+          </div>
+
+          <div style="margin-top:24px; padding-top:20px; border-top:1px solid #eee;">
+            <div class="wf-section-heading">History</div>
+            <div class="wf-activity">
+              <div class="wf-activity-item"><span class="wf-activity-date">Mar 15</span><span>Idea captured</span></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="wf-detail-sidebar">
+
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Excitement</div>
+            <div class="wf-excitement-widget">
+              <div class="wf-exc-dot on">●</div>
+              <div class="wf-exc-dot"></div>
+              <div class="wf-exc-dot"></div>
+              <span class="wf-exc-label">1 / 3</span>
+            </div>
+          </div>
+
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Project</div>
+            <div class="wf-project-select empty">
+              <span>— Unassigned —</span>
+              <span style="color:#ccc;">▾</span>
+            </div>
+          </div>
+
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Type</div>
+            <div class="wf-project-select empty">
+              <span>— Not set —</span>
+              <span style="color:#ccc;">▾</span>
+            </div>
+          </div>
+
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Added</div>
+            <div class="wf-meta-value">March 15, 2026</div>
+          </div>
+
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Last reviewed</div>
+            <div class="wf-meta-value empty">Never reviewed</div>
+          </div>
+
+          <div class="wf-sidebar-danger">
+            <a class="wf-danger-link">Archive idea…</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 3 — INLINE EDIT MODE (content being edited)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 3 — Inline edit active <span class="ann">4</span></div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas/idea_abc123</div>
+    </div>
+    <div class="wf-app">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+
+      <div class="wf-page-header">
+        <div class="wf-breadcrumb">
+          <a>Ideas</a><span class="wf-breadcrumb-sep">›</span>
+          <span>What if a retired forensic linguist…</span>
+          <span style="flex:1;"></span>
+          <div class="wf-idea-nav">
+            <div class="wf-icon-btn">‹</div>
+            <div class="wf-icon-btn">›</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-detail-layout">
+        <div class="wf-detail-main">
+
+          <div class="wf-idea-header">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="wf-type-badge">WHAT IF</div>
+              <span style="font-size:11px;color:#bbb;">Added Mar 1</span>
+            </div>
+            <div class="wf-idea-actions">
+              <button class="wf-btn wf-btn-primary wf-btn-sm">Save</button>
+              <button class="wf-btn wf-btn-ghost wf-btn-sm">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Editing state — textarea visible -->
+          <textarea class="wf-idea-content editing" style="height:100px; font-size:15px; line-height:1.6; width:100%;" readonly
+          >What if a retired forensic linguist discovers her own voice in a 20-year-old hostage recording she has no memory of making?</textarea>
+          <div class="wf-edit-hint" style="color:#aaa;">⌘ + Enter to save · Esc to cancel</div>
+
+          <div class="wf-tags-row" style="margin-top:12px;">
+            <div class="wf-tag">thriller <span class="wf-tag-remove">✕</span></div>
+            <div class="wf-tag">memory <span class="wf-tag-remove">✕</span></div>
+            <div class="wf-add-tag">+ add tag</div>
+          </div>
+
+        </div>
+
+        <div class="wf-detail-sidebar">
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Excitement</div>
+            <div class="wf-excitement-widget">
+              <div class="wf-exc-dot on">●</div>
+              <div class="wf-exc-dot on">●</div>
+              <div class="wf-exc-dot on">●</div>
+              <span class="wf-exc-label">3 / 3</span>
+            </div>
+          </div>
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Project</div>
+            <div class="wf-project-select"><span>The Linguist</span><span style="color:#ccc;">▾</span></div>
+          </div>
+          <div class="wf-meta-field">
+            <div class="wf-meta-label">Type</div>
+            <div class="wf-project-select"><span>What If</span><span style="color:#ccc;">▾</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── Annotations ──────────────────────────────────────────── -->
+  <div class="wf-annotations">
+    <h2>Annotations</h2>
+    <ol>
+      <li>
+        <strong>[1] Prev / Next navigation in breadcrumb</strong> —
+        The breadcrumb bar includes ‹ › arrows to step through ideas in the current list context (whatever filter/sort was active when the user clicked in). This preserves the review flow — user can scan through stale ideas without returning to the list each time.
+        <span class="req">FR-07</span>
+      </li>
+      <li>
+        <strong>[2] Stale banner is the primary review prompt</strong> —
+        When <code>lastReviewedAt</code> is more than 14 days ago, a banner appears with the exact age and a "Mark as reviewed" link. Clicking "Mark as reviewed" updates <code>lastReviewedAt</code> and dismisses the banner without requiring any other action.
+        <span class="req">FR-10</span>
+        <span class="req">BR-04</span>
+      </li>
+      <li>
+        <strong>[3] Promote to Scene is surfaced as a dedicated icon button</strong> —
+        The ↑ icon appears in the action row only for WHAT_IF type ideas (FR-22). For all other types it's hidden. This keeps it discoverable without cluttering the UI for non-promotable ideas.
+        <span class="req">FR-22</span>
+      </li>
+      <li>
+        <strong>[4] Inline edit — click the content to edit</strong> —
+        The idea content is not always in a textarea — it renders as plain text. Clicking it activates inline editing (textarea appears, Save/Cancel replace the action buttons). ⌘+Enter saves; Esc cancels. Saving also sets <code>lastReviewedAt</code>.
+        <span class="req">FR-01</span>
+      </li>
+      <li>
+        <strong>[5] Tags are editable inline</strong> —
+        Existing tags show an ✕ to remove. "+ add tag" opens a small inline text input. Tags are saved on blur or Enter.
+        <span class="req">FR-04</span>
+      </li>
+      <li>
+        <strong>[6] Excitement widget is directly clickable in the sidebar</strong> —
+        Clicking any dot sets the rating. Dot 1 = Low, 2 = Medium, 3 = High. Clicking the already-selected dot clears the rating (back to unset). Updating excitement also sets <code>lastReviewedAt</code>.
+        <span class="req">FR-12</span>
+      </li>
+      <li>
+        <strong>[7] Project assignment via inline dropdown</strong> —
+        The project selector in the sidebar is a dropdown. Selecting a project assigns the idea (FR-15). Selecting "— Unassigned —" removes the assignment. This replaces the "Assign to project" flow from the card action menu — same result, different entry point.
+        <span class="req">FR-03</span>
+        <span class="req">FR-15</span>
+      </li>
+      <li>
+        <strong>[8] Type is changeable from the sidebar</strong> —
+        The type selector in the sidebar allows retyping an idea without going back to capture. This is how a raw/untyped idea gets classified. The "Set type now" link in the raw banner also scrolls to and activates this dropdown.
+        <span class="req">FR-02</span>
+        <span class="req">FR-11</span>
+      </li>
+      <li>
+        <strong>[9] Archive is in the sidebar danger zone, not a top-level action</strong> —
+        Archiving is infrequent and irreversible in feel (even though it's soft). Placing it below a divider at the bottom of the sidebar reduces accidental activation while keeping it accessible.
+        <span class="req">FR-13</span>
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>

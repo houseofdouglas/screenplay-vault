@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wireframe: Ideas List — Screenplay Idea Vault</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      background: #e8e8e8;
+      color: #222;
+      padding: 32px 24px 64px;
+    }
+    h1, h2, h3 { font-weight: 600; }
+
+    /* ─── Metadata header ──────────────────────────────────────── */
+    .wf-meta {
+      font-size: 11px;
+      color: #888;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      margin-bottom: 28px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .wf-meta span { display: inline-flex; gap: 4px; }
+    .wf-meta strong { color: #555; }
+
+    /* ─── State labels ─────────────────────────────────────────── */
+    .wf-state-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin: 40px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .wf-state-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ccc;
+    }
+
+    /* ─── Viewport / browser chrome ────────────────────────────── */
+    .wf-viewport {
+      background: #b0b0b0;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #999;
+    }
+    .wf-browser-chrome {
+      background: #d4d4d4;
+      border-bottom: 1px solid #bbb;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wf-traffic-lights { display: flex; gap: 5px; }
+    .wf-traffic-lights span {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #bbb; border: 1px solid #aaa;
+    }
+    .wf-url-bar {
+      flex: 1;
+      background: white;
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* ─── App shell ────────────────────────────────────────────── */
+    .wf-app {
+      background: #f5f5f5;
+      min-height: 620px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top nav */
+    .wf-nav {
+      background: white;
+      border-bottom: 1px solid #ddd;
+      padding: 0 20px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .wf-nav-logo {
+      font-weight: 800;
+      font-size: 13px;
+      color: #777;
+      background: #eee;
+      padding: 5px 9px;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+    .wf-nav-link {
+      font-size: 13px;
+      color: #aaa;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: default;
+    }
+    .wf-nav-link.active {
+      background: #f0f0f0;
+      color: #333;
+      font-weight: 600;
+    }
+    .wf-nav-spacer { flex: 1; }
+    .wf-fab {
+      width: 32px; height: 32px;
+      background: #444;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 300;
+      line-height: 1;
+      cursor: default;
+    }
+
+    /* ─── Page layout: sidebar + main ─────────────────────────── */
+    .wf-page {
+      display: flex;
+      flex: 1;
+    }
+
+    /* Sidebar filter panel */
+    .wf-sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: white;
+      border-right: 1px solid #e8e8e8;
+      padding: 16px 14px;
+    }
+    .wf-sidebar-section {
+      margin-bottom: 20px;
+    }
+    .wf-sidebar-heading {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    .wf-filter-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #555;
+      cursor: default;
+      margin-bottom: 2px;
+    }
+    .wf-filter-item:hover { background: #f5f5f5; }
+    .wf-filter-item.active {
+      background: #efefef;
+      font-weight: 600;
+      color: #222;
+    }
+    .wf-filter-count {
+      font-size: 10px;
+      color: #bbb;
+      background: #f0f0f0;
+      border-radius: 8px;
+      padding: 1px 6px;
+    }
+    .wf-filter-count.highlighted {
+      background: #e8e8e8;
+      color: #666;
+    }
+
+    /* ─── Main content area ────────────────────────────────────── */
+    .wf-main {
+      flex: 1;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    /* Toolbar: search + sort */
+    .wf-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .wf-search {
+      flex: 1;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: white;
+      padding: 7px 10px 7px 30px;
+      font-size: 13px;
+      color: #888;
+      position: relative;
+    }
+    .wf-search-wrap {
+      flex: 1;
+      position: relative;
+    }
+    .wf-search-icon {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: #bbb;
+      pointer-events: none;
+    }
+    .wf-sort-select {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: white;
+      padding: 7px 28px 7px 10px;
+      font-size: 12px;
+      color: #555;
+      cursor: default;
+      white-space: nowrap;
+      position: relative;
+    }
+    .wf-sort-wrap {
+      position: relative;
+    }
+    .wf-sort-caret {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #aaa;
+      pointer-events: none;
+    }
+
+    /* Active filter chips */
+    .wf-active-filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .wf-filter-label {
+      font-size: 11px;
+      color: #aaa;
+    }
+    .wf-filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #eee;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 3px 8px 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #555;
+      cursor: default;
+    }
+    .wf-chip-remove {
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    /* Result summary */
+    .wf-result-count {
+      font-size: 11px;
+      color: #aaa;
+    }
+    .wf-result-count strong { color: #666; }
+
+    /* ─── Idea cards ───────────────────────────────────────────── */
+    .wf-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .wf-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: default;
+      position: relative;
+    }
+    .wf-card:hover { border-color: #bbb; }
+    .wf-card.stale { border-left: 3px solid #bbb; }
+    .wf-card.raw-idea { border-left: 3px dashed #ccc; }
+
+    .wf-card-type-col { flex-shrink: 0; padding-top: 1px; }
+    .wf-type-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 2px 6px;
+      color: #555;
+      white-space: nowrap;
+    }
+    .wf-type-badge.raw {
+      background: white;
+      border-style: dashed;
+      border-color: #ccc;
+      color: #bbb;
+    }
+
+    .wf-card-body { flex: 1; min-width: 0; }
+    .wf-card-content {
+      font-size: 13px;
+      color: #222;
+      line-height: 1.4;
+      margin-bottom: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .wf-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .wf-card-tag {
+      font-size: 10px;
+      background: #f5f5f5;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: #888;
+    }
+    .wf-card-date {
+      font-size: 11px;
+      color: #bbb;
+    }
+    .wf-card-project {
+      font-size: 10px;
+      color: #999;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 1px 6px;
+    }
+
+    .wf-card-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .wf-excitement {
+      display: flex;
+      gap: 3px;
+    }
+    .wf-excitement-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ddd;
+      border: 1px solid #ccc;
+    }
+    .wf-excitement-dot.on {
+      background: #888;
+      border-color: #777;
+    }
+    .wf-stale-badge {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #bbb;
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 3px;
+      padding: 2px 5px;
+      white-space: nowrap;
+    }
+    .wf-card-actions {
+      display: flex;
+      gap: 4px;
+    }
+    .wf-icon-btn {
+      width: 24px; height: 24px;
+      background: #f5f5f5;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      color: #999;
+      cursor: default;
+    }
+
+    /* ─── Buttons ──────────────────────────────────────────────── */
+    .wf-btn {
+      padding: 7px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: default;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .wf-btn-primary {
+      background: #333;
+      border: 1px solid #222;
+      color: white;
+    }
+    .wf-btn-ghost {
+      background: white;
+      border: 1px solid #ccc;
+      color: #555;
+    }
+
+    /* ─── Empty state ──────────────────────────────────────────── */
+    .wf-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      gap: 12px;
+    }
+    .wf-empty-icon {
+      width: 56px; height: 56px;
+      border: 2px dashed #ccc;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      color: #ccc;
+    }
+    .wf-empty-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #777;
+    }
+    .wf-empty-body {
+      font-size: 13px;
+      color: #aaa;
+      max-width: 280px;
+      line-height: 1.5;
+    }
+
+    /* ─── No-results state ─────────────────────────────────────── */
+    .wf-no-results {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 20px;
+      text-align: center;
+      gap: 10px;
+    }
+    .wf-no-results-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #888;
+    }
+    .wf-no-results-body {
+      font-size: 12px;
+      color: #bbb;
+    }
+    .wf-link {
+      font-size: 12px;
+      color: #666;
+      text-decoration: underline;
+      cursor: default;
+    }
+
+    /* ─── Annotations ──────────────────────────────────────────── */
+    .wf-annotation-marker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px; height: 16px;
+      background: #1a6bb5;
+      color: white;
+      border-radius: 50%;
+      font-size: 9px;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-left: 4px;
+      cursor: default;
+    }
+    .wf-annotations {
+      margin-top: 48px;
+      border-top: 2px solid #ccc;
+      padding-top: 24px;
+      max-width: 760px;
+    }
+    .wf-annotations h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #777;
+      margin-bottom: 16px;
+    }
+    .wf-annotations ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wf-annotations li {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.5;
+    }
+    .wf-annotations li strong { color: #1a6bb5; }
+    .wf-req-tag {
+      font-size: 10px;
+      background: #e8f0fb;
+      color: #1a6bb5;
+      border: 1px solid #c0d4f0;
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* divider */
+    .wf-page-divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 0 0 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Metadata ──────────────────────────────────────────────── -->
+  <div class="wf-meta">
+    <span><strong>Screen:</strong> Ideas List</span>
+    <span><strong>Feature:</strong> screenplay-idea-vault</span>
+    <span><strong>Version:</strong> 1</span>
+    <span><strong>Date:</strong> 2026-03-22</span>
+    <span><strong>Flows:</strong> Flow 1 (Auth), Flow 3 (Browse &amp; Review), Flow 8 (Archive)</span>
+    <span><strong>Requirements:</strong> FR-07, FR-08, FR-09, FR-10, FR-11, FR-12, FR-13</span>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 1 — DEFAULT: populated list, no active filters
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 1 — Default (populated, no filters active)</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-app">
+
+      <!-- Nav -->
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab" title="New idea (N)">+</div>
+        <span class="wf-annotation-marker" style="margin-left:6px">1</span>
+      </div>
+
+      <div class="wf-page">
+
+        <!-- Sidebar filters -->
+        <div class="wf-sidebar">
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">All Ideas <span class="wf-annotation-marker">2</span></div>
+            <div class="wf-filter-item active">
+              All types
+              <span class="wf-filter-count highlighted">24</span>
+            </div>
+            <div class="wf-filter-item">
+              What If
+              <span class="wf-filter-count">8</span>
+            </div>
+            <div class="wf-filter-item">
+              Character
+              <span class="wf-filter-count">5</span>
+            </div>
+            <div class="wf-filter-item">
+              Setting
+              <span class="wf-filter-count">3</span>
+            </div>
+            <div class="wf-filter-item">
+              First Line
+              <span class="wf-filter-count">2</span>
+            </div>
+            <div class="wf-filter-item">
+              Scene
+              <span class="wf-filter-count">3</span>
+            </div>
+            <div class="wf-filter-item">
+              Theme
+              <span class="wf-filter-count">2</span>
+            </div>
+            <div class="wf-filter-item">
+              News Flash
+              <span class="wf-filter-count">1</span>
+            </div>
+          </div>
+
+          <div class="wf-page-divider"></div>
+
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">Project <span class="wf-annotation-marker">3</span></div>
+            <div class="wf-filter-item active">
+              All projects
+              <span class="wf-filter-count highlighted">24</span>
+            </div>
+            <div class="wf-filter-item">
+              The Linguist
+              <span class="wf-filter-count">11</span>
+            </div>
+            <div class="wf-filter-item">
+              Untitled #2
+              <span class="wf-filter-count">4</span>
+            </div>
+            <div class="wf-filter-item" style="color:#bbb; font-style:italic;">
+              Unassigned
+              <span class="wf-filter-count">9</span>
+            </div>
+          </div>
+
+          <div class="wf-page-divider"></div>
+
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">Inbox <span class="wf-annotation-marker">4</span></div>
+            <div class="wf-filter-item">
+              ⚠ Stale ideas
+              <span class="wf-filter-count">6</span>
+            </div>
+            <div class="wf-filter-item">
+              ◌ Raw / untyped
+              <span class="wf-filter-count">3</span>
+            </div>
+            <div class="wf-filter-item">
+              ▿ Archived
+              <span class="wf-filter-count">7</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="wf-main">
+
+          <!-- Toolbar -->
+          <div class="wf-toolbar">
+            <div class="wf-search-wrap" style="flex:1;">
+              <span class="wf-search-icon">⌕</span>
+              <div class="wf-search">Search ideas, tags…</div>
+            </div>
+            <div class="wf-sort-wrap">
+              <div class="wf-sort-select">Sort: Most recent</div>
+              <span class="wf-sort-caret">▾</span>
+            </div>
+            <span class="wf-annotation-marker">5</span>
+          </div>
+
+          <!-- Result count -->
+          <div class="wf-result-count"><strong>24</strong> ideas</div>
+
+          <!-- Cards -->
+          <div class="wf-card-list">
+
+            <!-- Card 1: stale, has excitement -->
+            <div class="wf-card stale">
+              <div class="wf-card-type-col">
+                <div class="wf-type-badge">WHAT IF</div>
+              </div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">
+                  What if a retired forensic linguist discovers their own voice in a hostage recording from 20 years ago?
+                </div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-project">The Linguist</span>
+                  <span class="wf-card-tag">thriller</span>
+                  <span class="wf-card-tag">memory</span>
+                  <span class="wf-card-date">Added Mar 1</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div class="wf-stale-badge">21 days ago <span class="wf-annotation-marker" style="width:13px;height:13px;font-size:8px">6</span></div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="wf-excitement" title="Excitement: 3/3">
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot on"></div>
+                  </div>
+                  <div class="wf-icon-btn" title="More actions">⋯</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: normal, 2 excitement -->
+            <div class="wf-card">
+              <div class="wf-card-type-col">
+                <div class="wf-type-badge">CHARACTER</div>
+              </div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">
+                  A disgraced archivist who memorised the contents of every document she ever destroyed
+                </div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-project">The Linguist</span>
+                  <span class="wf-card-tag">obsession</span>
+                  <span class="wf-card-date">Added Mar 8</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="wf-excitement">
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot"></div>
+                  </div>
+                  <div class="wf-icon-btn" title="More actions">⋯</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: raw / untyped -->
+            <div class="wf-card raw-idea">
+              <div class="wf-card-type-col">
+                <div class="wf-type-badge raw">UNTYPED <span class="wf-annotation-marker" style="width:13px;height:13px;font-size:8px">7</span></div>
+              </div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">
+                  Something about the way grief makes you mishear things — like phantom phone calls from the dead
+                </div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-date" style="color:#bbb; font-style:italic;">No project · No tags</span>
+                  <span class="wf-card-date">Added Mar 15</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="wf-excitement">
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot"></div>
+                    <div class="wf-excitement-dot"></div>
+                  </div>
+                  <div class="wf-icon-btn" title="More actions">⋯</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: stale, scene type -->
+            <div class="wf-card stale">
+              <div class="wf-card-type-col">
+                <div class="wf-type-badge">SCENE</div>
+              </div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">
+                  INT. RECORDS VAULT — NIGHT. She plays the tape for the 40th time. Her lips move silently along with it.
+                </div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-project">The Linguist</span>
+                  <span class="wf-card-tag">act-2</span>
+                  <span class="wf-card-date">Added Feb 18</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div class="wf-stale-badge">32 days ago</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="wf-excitement">
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot"></div>
+                  </div>
+                  <div class="wf-icon-btn" title="More actions">⋯</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: normal, setting, unassigned -->
+            <div class="wf-card">
+              <div class="wf-card-type-col">
+                <div class="wf-type-badge">SETTING</div>
+              </div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">
+                  A government archive basement where classified tapes from Cold War interrogations are still technically "under review"
+                </div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-tag">cold-war</span>
+                  <span class="wf-card-tag">government</span>
+                  <span class="wf-card-date" style="color:#bbb; font-style:italic;">Unassigned</span>
+                  <span class="wf-card-date">Added Mar 12</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="wf-excitement">
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot on"></div>
+                    <div class="wf-excitement-dot on"></div>
+                  </div>
+                  <div class="wf-icon-btn" title="More actions">⋯</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6: first line, no excitement set -->
+            <div class="wf-card">
+              <div class="wf-card-type-col">
+                <div class="wf-type-badge">FIRST LINE</div>
+              </div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">
+                  "The voice on the tape is mine. The problem is I've never been to Belarus."
+                </div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-project">The Linguist</span>
+                  <span class="wf-card-date">Added Mar 19</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="wf-excitement" title="Not yet rated">
+                    <div class="wf-excitement-dot" style="border-style:dashed"></div>
+                    <div class="wf-excitement-dot" style="border-style:dashed"></div>
+                    <div class="wf-excitement-dot" style="border-style:dashed"></div>
+                  </div>
+                  <div class="wf-icon-btn" title="More actions">⋯</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <!-- end card list -->
+
+        </div>
+        <!-- end main -->
+      </div>
+      <!-- end page -->
+
+    </div>
+    <!-- end app -->
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 2 — FILTERED: type = "What If", active filter shown
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 2 — Filtered (type = "What If") + search active</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas?type=WHAT_IF&q=linguist</div>
+    </div>
+    <div class="wf-app">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+
+      <div class="wf-page">
+        <div class="wf-sidebar">
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">All Ideas</div>
+            <div class="wf-filter-item">All types <span class="wf-filter-count">24</span></div>
+            <div class="wf-filter-item active">What If <span class="wf-filter-count highlighted">8</span></div>
+            <div class="wf-filter-item">Character <span class="wf-filter-count">5</span></div>
+            <div class="wf-filter-item">Setting <span class="wf-filter-count">3</span></div>
+            <div class="wf-filter-item">First Line <span class="wf-filter-count">2</span></div>
+            <div class="wf-filter-item">Scene <span class="wf-filter-count">3</span></div>
+            <div class="wf-filter-item">Theme <span class="wf-filter-count">2</span></div>
+            <div class="wf-filter-item">News Flash <span class="wf-filter-count">1</span></div>
+          </div>
+          <div class="wf-page-divider"></div>
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">Project</div>
+            <div class="wf-filter-item active">All projects <span class="wf-filter-count highlighted">24</span></div>
+            <div class="wf-filter-item">The Linguist <span class="wf-filter-count">11</span></div>
+            <div class="wf-filter-item">Untitled #2 <span class="wf-filter-count">4</span></div>
+            <div class="wf-filter-item" style="color:#bbb;font-style:italic;">Unassigned <span class="wf-filter-count">9</span></div>
+          </div>
+          <div class="wf-page-divider"></div>
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">Inbox</div>
+            <div class="wf-filter-item">⚠ Stale ideas <span class="wf-filter-count">6</span></div>
+            <div class="wf-filter-item">◌ Raw / untyped <span class="wf-filter-count">3</span></div>
+            <div class="wf-filter-item">▿ Archived <span class="wf-filter-count">7</span></div>
+          </div>
+        </div>
+
+        <div class="wf-main">
+          <div class="wf-toolbar">
+            <div class="wf-search-wrap" style="flex:1;">
+              <span class="wf-search-icon">⌕</span>
+              <div class="wf-search" style="color:#222; border-color:#999;">linguist</div>
+            </div>
+            <div class="wf-sort-wrap">
+              <div class="wf-sort-select">Sort: Most recent</div>
+              <span class="wf-sort-caret">▾</span>
+            </div>
+          </div>
+
+          <!-- Active filter chips -->
+          <div class="wf-active-filters">
+            <span class="wf-filter-label">Filters:</span>
+            <div class="wf-filter-chip">
+              Type: What If
+              <span class="wf-chip-remove">✕</span>
+            </div>
+            <span class="wf-link">Clear all</span>
+            <span class="wf-annotation-marker">8</span>
+          </div>
+
+          <div class="wf-result-count"><strong>2</strong> of 8 What If ideas match "linguist"</div>
+
+          <div class="wf-card-list">
+            <div class="wf-card stale">
+              <div class="wf-card-type-col"><div class="wf-type-badge">WHAT IF</div></div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">What if a retired forensic <mark style="background:#eee; border-radius:2px; padding:0 2px">linguist</mark> discovers their own voice in a hostage recording from 20 years ago?</div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-project">The Linguist</span>
+                  <span class="wf-card-tag">thriller</span>
+                  <span class="wf-card-date">Added Mar 1</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div class="wf-stale-badge">21 days ago</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="wf-excitement"><div class="wf-excitement-dot on"></div><div class="wf-excitement-dot on"></div><div class="wf-excitement-dot on"></div></div>
+                  <div class="wf-icon-btn">⋯</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-card">
+              <div class="wf-card-type-col"><div class="wf-type-badge">WHAT IF</div></div>
+              <div class="wf-card-body">
+                <div class="wf-card-content">What if the <mark style="background:#eee; border-radius:2px; padding:0 2px">linguist</mark>'s ability to identify voices starts working in reverse — she forgets how to recognise her own?</div>
+                <div class="wf-card-meta">
+                  <span class="wf-card-project">The Linguist</span>
+                  <span class="wf-card-tag">identity</span>
+                  <span class="wf-card-date">Added Mar 10</span>
+                </div>
+              </div>
+              <div class="wf-card-right">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="wf-excitement"><div class="wf-excitement-dot on"></div><div class="wf-excitement-dot on"></div><div class="wf-excitement-dot"></div></div>
+                  <div class="wf-icon-btn">⋯</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 3 — EMPTY (first login, no ideas yet)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 3 — Empty (first login, zero ideas) <span class="wf-annotation-marker">9</span></div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-app">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-page" style="justify-content:center;">
+        <div class="wf-empty">
+          <div class="wf-empty-icon">💡</div>
+          <div class="wf-empty-title">Your vault is empty</div>
+          <div class="wf-empty-body">
+            Capture your first idea — a what-if, a character, a scene, a first line. Anything.
+          </div>
+          <button class="wf-btn wf-btn-primary">+ Capture an idea</button>
+          <div style="font-size:11px; color:#bbb; margin-top:4px;">or press <strong>N</strong> anywhere</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 4 — NO RESULTS (search returned nothing)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 4 — No search results</div>
+
+  <div class="wf-viewport">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas?q=cthulhu</div>
+    </div>
+    <div class="wf-app">
+      <div class="wf-nav">
+        <div class="wf-nav-logo">SV</div>
+        <div class="wf-nav-link active">Ideas</div>
+        <div class="wf-nav-link">Projects</div>
+        <div class="wf-nav-spacer"></div>
+        <div class="wf-fab">+</div>
+      </div>
+      <div class="wf-page">
+        <div class="wf-sidebar">
+          <div class="wf-sidebar-section">
+            <div class="wf-sidebar-heading">All Ideas</div>
+            <div class="wf-filter-item active">All types <span class="wf-filter-count highlighted">24</span></div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-toolbar">
+            <div class="wf-search-wrap" style="flex:1;">
+              <span class="wf-search-icon">⌕</span>
+              <div class="wf-search" style="color:#222; border-color:#999;">cthulhu</div>
+            </div>
+          </div>
+          <div class="wf-result-count"><strong>0</strong> results for "cthulhu"</div>
+          <div class="wf-no-results">
+            <div class="wf-no-results-title">No ideas match "cthulhu"</div>
+            <div class="wf-no-results-body">Try different keywords, or capture this as a new idea.</div>
+            <button class="wf-btn wf-btn-primary" style="margin-top:8px;">+ Capture "cthulhu" as idea</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════
+       STATE 5 — CARD ACTIONS MENU (overflow ⋯ expanded)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="wf-state-label">State 5 — Card actions menu open <span class="wf-annotation-marker">10</span></div>
+
+  <div class="wf-viewport" style="max-width:500px;">
+    <div class="wf-browser-chrome">
+      <div class="wf-traffic-lights"><span></span><span></span><span></span></div>
+      <div class="wf-url-bar">app.screenplayvault.com/ideas</div>
+    </div>
+    <div class="wf-app" style="min-height:auto;">
+      <div class="wf-main" style="padding:12px 16px;">
+        <div class="wf-card-list">
+          <div class="wf-card stale" style="position:relative;">
+            <div class="wf-card-type-col"><div class="wf-type-badge">WHAT IF</div></div>
+            <div class="wf-card-body">
+              <div class="wf-card-content">What if a retired forensic linguist discovers their own voice in a hostage recording…</div>
+              <div class="wf-card-meta">
+                <span class="wf-card-project">The Linguist</span>
+                <span class="wf-card-date">Added Mar 1</span>
+              </div>
+            </div>
+            <div class="wf-card-right">
+              <div class="wf-stale-badge">21 days ago</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="wf-excitement"><div class="wf-excitement-dot on"></div><div class="wf-excitement-dot on"></div><div class="wf-excitement-dot on"></div></div>
+                <div class="wf-icon-btn" style="background:#333; color:white; border-color:#333;">⋯</div>
+              </div>
+            </div>
+            <!-- Dropdown menu -->
+            <div style="position:absolute; top:36px; right:14px; background:white; border:1px solid #ccc; border-radius:5px; box-shadow:0 4px 12px rgba(0,0,0,0.12); z-index:10; min-width:160px; padding:4px 0;">
+              <div style="padding:7px 14px; font-size:12px; color:#333; cursor:default;">View / Edit</div>
+              <div style="padding:7px 14px; font-size:12px; color:#333; cursor:default;">Assign to project…</div>
+              <div style="padding:7px 14px; font-size:12px; color:#333; cursor:default;">Promote to Scene…</div>
+              <div style="height:1px; background:#eee; margin:3px 0;"></div>
+              <div style="padding:7px 14px; font-size:12px; color:#c00; cursor:default;">Archive idea</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── Annotations ──────────────────────────────────────────── -->
+  <div class="wf-annotations">
+    <h2>Annotations</h2>
+    <ol>
+      <li>
+        <strong>[1] FAB is the persistent capture entry point</strong> —
+        The + button appears in the top-right nav on every authenticated screen. Keyboard shortcut <code>N</code> also triggers the Quick Capture Modal. The nav is intentionally minimal — two items only (Ideas, Projects).
+        <span class="wf-req-tag">FR-05</span>
+      </li>
+      <li>
+        <strong>[2] Type filter in sidebar, not a top bar</strong> —
+        With 7 types plus "All", a sidebar list is cleaner than a horizontal pill row. Counts update in real-time as search/project filters are applied. Clicking a type sets it as the active filter.
+        <span class="wf-req-tag">FR-09</span>
+      </li>
+      <li>
+        <strong>[3] Project filter in sidebar</strong> —
+        Lists all the user's projects plus an "Unassigned" entry. Selecting a project narrows the idea list to only that project's ideas. This is a sidebar-level filter, not the same as the Project Dashboard view.
+        <span class="wf-req-tag">FR-09</span>
+      </li>
+      <li>
+        <strong>[4] "Inbox" sidebar section for housekeeping views</strong> —
+        "Stale ideas" (>14 days, FR-10) and "Raw / untyped" (FR-11) are shortcuts that pre-apply the relevant filter. "Archived" opens the archived ideas view. These are high-value housekeeping tasks surfaced without cluttering the main list.
+        <span class="wf-req-tag">FR-10</span>
+        <span class="wf-req-tag">FR-11</span>
+        <span class="wf-req-tag">FR-13</span>
+      </li>
+      <li>
+        <strong>[5] Sort is a single dropdown, not a column header sort</strong> —
+        Cards are not a table — sorting by column header doesn't apply. A simple dropdown with 3 options (Most recent, Type, Last reviewed) is sufficient. "Last reviewed" sort is the most powerful for surfacing stale ideas.
+        <span class="wf-req-tag">FR-07</span>
+      </li>
+      <li>
+        <strong>[6] Stale indicator: date stamp, not just a dot</strong> —
+        Showing the actual age ("21 days ago") is more actionable than a generic warning icon. The left border accent (solid gray) is a secondary visual cue. Cards older than 14 days since <code>lastReviewedAt</code> get this treatment.
+        <span class="wf-req-tag">FR-10</span>
+      </li>
+      <li>
+        <strong>[7] Raw / untyped indicator: dashed border + dashed type badge</strong> —
+        Ideas with no type assigned use a dashed left border and a dashed "UNTYPED" badge instead of a filled type pill. This is visually distinctive without being alarming — raw ideas are valid, just incomplete.
+        <span class="wf-req-tag">FR-11</span>
+      </li>
+      <li>
+        <strong>[8] Active filter chips with "Clear all"</strong> —
+        When filters are active, chips appear in the toolbar row. Each chip has an ✕ to remove that specific filter. "Clear all" resets everything. This maintains affordance for "how do I get back to all ideas?".
+        <span class="wf-req-tag">FR-09</span>
+      </li>
+      <li>
+        <strong>[9] Empty state prompts the first action directly</strong> —
+        The empty state is not just a message — it includes a primary CTA button (+ Capture an idea) and a keyboard shortcut reminder. No onboarding wizard, no multi-step setup — get straight to capture.
+        <span class="wf-req-tag">BR-02</span>
+      </li>
+      <li>
+        <strong>[10] Card overflow menu for secondary actions</strong> —
+        The ⋯ button on each card opens a context menu with: View/Edit, Assign to project, Promote to Scene (WHAT_IF type only), and Archive. Archive is visually separated and shown in red to signal destructive intent (even though it's soft/recoverable).
+        <span class="wf-req-tag">FR-13</span>
+        <span class="wf-req-tag">FR-22</span>
+      </li>
+      <li>
+        <strong>[11] Excitement rating: 3 dots, inline on card</strong> —
+        Shown as 3 dots (filled = rated, dashed outline = not yet rated) on every card. The user can update the rating on the Idea Detail screen — it's read-only on the list card. This keeps the card compact while showing the data at a glance.
+        <span class="wf-req-tag">FR-12</span>
+      </li>
+      <li>
+        <strong>[12] Search highlights matched text</strong> —
+        When a search is active, matched terms are highlighted inline in the card content (light gray highlight). This is a quality-of-life feature — keeps the user oriented after filtering.
+        <span class="wf-req-tag">FR-08</span>
+      </li>
+      <li>
+        <strong>[13] No-results state offers to capture the search term as a new idea</strong> —
+        If a search returns nothing, the CTA is "Capture [term] as idea" — pre-filling the Quick Capture Modal with the search text. Turns a failed search into fast capture.
+        <span class="wf-req-tag">BR-02</span>
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>
