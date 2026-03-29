@@ -9,9 +9,13 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ULCA_ROOT="$(cd "$REPO_ROOT/../../ulca" && pwd)"
 cd "$REPO_ROOT"
 
-echo "==> Pulling latest from origin/main..."
+echo "==> Pulling ulca..."
+git -C "$ULCA_ROOT" pull --ff-only origin main
+
+echo "==> Pulling screenplay-vault..."
 git pull --ff-only origin main
 
 echo "==> Installing dependencies (only runs if lockfile changed)..."
